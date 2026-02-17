@@ -431,6 +431,21 @@ body {
   image-rendering: pixelated;
 }
 
+.sponsor-logo {
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
+  image-rendering: auto;
+  filter: invert(1) brightness(1.06) contrast(1.12);
+  mix-blend-mode: screen;
+  opacity: 0.94;
+}
+
+.sponsor-link:hover .sponsor-logo {
+  filter: invert(1) brightness(1.14) contrast(1.2);
+  opacity: 1;
+}
+
 .terminal-line {
   font-size: 22px;
   color: var(--text-blue);

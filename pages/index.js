@@ -281,10 +281,11 @@ export default function Home() {
                   aria-label="CREAO sponsor"
                 >
                   <img
+                    className="sponsor-logo"
                     src="/creao-logo.svg"
                     alt="CREAO logo"
-                    width="24"
-                    height="24"
+                    width="30"
+                    height="30"
                   />
                 </a>
               </div>
