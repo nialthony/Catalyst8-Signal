@@ -107,52 +107,46 @@ export default function Home() {
     }
   }, [theme]);
 
-  useEffect(() => {
-    const keyword = coinQuery.trim();
-    if (keyword.length < 2) {
+  async function searchCoinSuggestions(rawKeyword) {
+    const keyword = String(rawKeyword || coinQuery || '').trim();
+    if (!keyword) {
       setCoinSuggestions([]);
       setSearchingCoins(false);
+      setShowSuggestions(false);
       return;
     }
 
-    const controller = new AbortController();
-    const timer = setTimeout(async () => {
-      const normalizedKeyword = keyword.toLowerCase();
-      const now = Date.now();
-      const cached = coinSearchCacheRef.current.get(normalizedKeyword);
-      if (cached && cached.expiresAt > now) {
-        setCoinSuggestions(cached.coins);
-        return;
-      }
+    const normalizedKeyword = keyword.toLowerCase();
+    const cached = coinSearchCacheRef.current.get(normalizedKeyword);
+    if (cached && cached.expiresAt > Date.now()) {
+      setCoinSuggestions((cached.coins || []).slice(0, 5));
+      setShowSuggestions(true);
+      return;
+    }
 
-      setSearchingCoins(true);
-      try {
-        const params = new URLSearchParams({ q: keyword, limit: '8' });
-        const res = await fetch(`/api/coins/search?${params}`, { signal: controller.signal });
-        if (!res.ok) throw new Error('Search request failed');
-        const payload = await res.json();
-        const coins = payload.coins || [];
-        setCoinSuggestions(coins);
-        coinSearchCacheRef.current.set(normalizedKeyword, {
-          coins,
-          expiresAt: now + COIN_SEARCH_CACHE_TTL_MS,
-        });
-        if (coinSearchCacheRef.current.size > 120) {
-          const oldest = coinSearchCacheRef.current.keys().next().value;
-          if (oldest) coinSearchCacheRef.current.delete(oldest);
-        }
-      } catch {
-        if (!controller.signal.aborted) setCoinSuggestions([]);
-      } finally {
-        if (!controller.signal.aborted) setSearchingCoins(false);
+    setSearchingCoins(true);
+    setShowSuggestions(true);
+    try {
+      const params = new URLSearchParams({ q: keyword, limit: '5' });
+      const res = await fetch(`/api/coins/search?${params}`);
+      if (!res.ok) throw new Error('Search request failed');
+      const payload = await res.json();
+      const coins = Array.isArray(payload.coins) ? payload.coins.slice(0, 5) : [];
+      setCoinSuggestions(coins);
+      coinSearchCacheRef.current.set(normalizedKeyword, {
+        coins,
+        expiresAt: Date.now() + COIN_SEARCH_CACHE_TTL_MS,
+      });
+      if (coinSearchCacheRef.current.size > 120) {
+        const oldest = coinSearchCacheRef.current.keys().next().value;
+        if (oldest) coinSearchCacheRef.current.delete(oldest);
       }
-    }, 260);
-
-    return () => {
-      clearTimeout(timer);
-      controller.abort();
-    };
-  }, [coinQuery]);
+    } catch {
+      setCoinSuggestions([]);
+    } finally {
+      setSearchingCoins(false);
+    }
+  }
 
   async function generate() {
     setLoading(true);
@@ -232,17 +226,26 @@ export default function Home() {
                   onChange={(e) => {
                     setCoinQuery(e.target.value);
                     setSelectedCoin(null);
-                    setShowSuggestions(true);
+                    setCoinSuggestions([]);
+                    setShowSuggestions(false);
                   }}
-                  onFocus={() => setShowSuggestions(true)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      searchCoinSuggestions(e.currentTarget.value);
+                    }
+                  }}
+                  onFocus={() => {
+                    if (coinSuggestions.length) setShowSuggestions(true);
+                  }}
                   onBlur={() => setTimeout(() => setShowSuggestions(false), 140)}
-                  placeholder="Type coin name or symbol (e.g. pepe, sui, arb)"
+                  placeholder="Type symbol then press Enter (e.g. BTC, ETH, SUI)"
                   autoComplete="off"
                 />
                 {showSuggestions && (
                   <div className="coin-suggestions">
                     {searchingCoins && <div className="coin-suggestion muted">Searching...</div>}
-                    {!searchingCoins && coinSuggestions.length === 0 && coinQuery.trim().length >= 2 && (
+                    {!searchingCoins && coinSuggestions.length === 0 && coinQuery.trim().length >= 1 && (
                       <div className="coin-suggestion muted">No coin found</div>
                     )}
                     {!searchingCoins && coinSuggestions.map((coin) => (
@@ -252,7 +255,7 @@ export default function Home() {
                         className="coin-suggestion"
                         onMouseDown={() => {
                           setSelectedCoin(coin);
-                          setCoinQuery(coin.name);
+                          setCoinQuery(coin.symbol);
                           setShowSuggestions(false);
                         }}
                       >
@@ -269,7 +272,7 @@ export default function Home() {
               <div className="coin-hint">
                 {selectedCoin
                   ? `Selected: ${selectedCoin.name} (${selectedCoin.symbol})`
-                  : 'Select one of the suggested coins for best accuracy'}
+                  : 'Type a symbol, press Enter, then choose one of the 5 suggestions'}
               </div>
             </div>
             <div className="form-group">
