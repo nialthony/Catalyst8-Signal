@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200" role="img" aria-label="CREAO logo">
+  <rect width="200" height="200" fill="#e5e5e5"/>
+  <path d="M25 138 L74 56 L124 138 L95 138 L74 103 L53 138 Z" fill="#050505"/>
+  <path d="M76 138 L110 138 L110 121 L93 121 Z" fill="#e5e5e5"/>
+  <path d="M168 96 C168 124 147 146 119 146 C101 146 85 137 75 122 L89 113 C97 125 108 131 119 131 C139 131 153 116 153 96 C153 76 139 61 119 61 C108 61 97 67 89 79 L75 70 C85 55 101 46 119 46 C147 46 168 68 168 96 Z" fill="#050505"/>
+</svg>

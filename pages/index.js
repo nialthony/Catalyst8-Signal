@@ -281,7 +281,7 @@ export default function Home() {
                   aria-label="CREAO sponsor"
                 >
                   <img
-                    src="https://image.pitchbook.com/up3cCFiKSj2jIsAKxTNB3ligmx01754048047683_200x200"
+                    src="/creao-logo.svg"
                     alt="CREAO logo"
                     width="24"
                     height="24"
@@ -712,6 +712,30 @@ export default function Home() {
                 <div className="indicator-card">
                   <div className="label">ATR 14</div>
                   <div className="value">{fmt(data.indicators.atr14, 4)}</div>
+                </div>
+                <div className="indicator-card">
+                  <div className="label">ADX 14</div>
+                  <div className="value">{data.indicators.adx14 ?? '-'}</div>
+                </div>
+                <div className="indicator-card">
+                  <div className="label">Stoch K / D</div>
+                  <div className="value">
+                    {data.indicators.stochastic?.k != null && data.indicators.stochastic?.d != null
+                      ? `${data.indicators.stochastic.k} / ${data.indicators.stochastic.d}`
+                      : '-'}
+                  </div>
+                </div>
+                <div className="indicator-card">
+                  <div className="label">EMA20 Slope</div>
+                  <div className={`value ${toneClass(data.indicators.ema20SlopePct)}`}>
+                    {data.indicators.ema20SlopePct != null ? fmtPct(data.indicators.ema20SlopePct, 2) : '-'}
+                  </div>
+                </div>
+                <div className="indicator-card">
+                  <div className="label">EMA50 Slope</div>
+                  <div className={`value ${toneClass(data.indicators.ema50SlopePct)}`}>
+                    {data.indicators.ema50SlopePct != null ? fmtPct(data.indicators.ema50SlopePct, 2) : '-'}
+                  </div>
                 </div>
                 <div className="indicator-card">
                   <div className="label">Momentum 3</div>
