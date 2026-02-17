@@ -203,15 +203,26 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>Catalyst8 Signal</title>
+        <title>Catalyst8 Signal Terminal</title>
       </Head>
 
-      <div className="container">
-        {/* Header */}
-        <header className="header">
-          <h1>Catalyst8 Signal</h1>
-          <p>Market intelligence with technical confluence, catalyst watch, and liquidity heat map</p>
-        </header>
+      <div className="terminal-shell">
+        <div className="terminal-topbar">
+          <div className="terminal-dots">
+            <span className="dot dot-red" />
+            <span className="dot dot-yellow" />
+            <span className="dot dot-green" />
+          </div>
+          <div className="terminal-title">catalyst8@terminal:~</div>
+        </div>
+        <div className="terminal-screen">
+          <div className="container">
+            {/* Header */}
+            <header className="header terminal-header">
+              <p className="terminal-line">$ boot catalyst8-signal --mode futures</p>
+              <h1>Catalyst8 Signal</h1>
+              <p>Terminal market intelligence with confluence, catalyst watch, and liquidity heat map</p>
+            </header>
 
         {/* Form */}
         <div className="form-card">
@@ -294,14 +305,14 @@ export default function Home() {
               </select>
             </div>
             <div className="form-group">
-              <label>Theme</label>
+              <label>Terminal Skin</label>
               <select value={theme} onChange={(e) => setTheme(e.target.value)}>
                 {THEMES.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
               </select>
             </div>
           </div>
           <button className="btn-generate" onClick={generate} disabled={loading}>
-            {loading ? 'Analyzing Market...' : 'Generate Signal'}
+            {loading ? 'Running analysis...' : 'Run Analysis'}
           </button>
         </div>
 
@@ -680,11 +691,13 @@ export default function Home() {
         )}
 
         {/* Footer */}
-        <footer className="footer">
-          Catalyst8 Signal &mdash; Built for{' '}
-          <a href="https://avalon-vibe.devpost.com/" target="_blank" rel="noopener noreferrer">Avalon Vibe Hackathon 2026</a>
-          {' '}&middot; Powered by <a href="https://creao.ai" target="_blank" rel="noopener noreferrer">CREAO</a>
-        </footer>
+            <footer className="footer">
+              catalyst8_signal::online | Built for{' '}
+              <a href="https://avalon-vibe.devpost.com/" target="_blank" rel="noopener noreferrer">Avalon Vibe Hackathon 2026</a>
+              {' '}&middot; Powered by <a href="https://creao.ai" target="_blank" rel="noopener noreferrer">CREAO</a>
+            </footer>
+          </div>
+        </div>
       </div>
     </>
   );
