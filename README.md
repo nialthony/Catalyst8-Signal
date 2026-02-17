@@ -102,6 +102,9 @@ npm install
 # Optional (recommended): set CoinGecko SDK API key for higher request limits
 # Backward-compatible env:
 echo COINGECKO_API_KEY=your_key_here > .env.local
+# Alias supported:
+# echo CG_API_KEY=your_key_here > .env.local
+# echo NEXT_PUBLIC_COINGECKO_API_KEY=your_key_here > .env.local
 
 # Preferred explicit env for SDK auth mode:
 echo COINGECKO_API_ENV=demo >> .env.local

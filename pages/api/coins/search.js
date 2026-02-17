@@ -1,4 +1,4 @@
-import { searchCoins } from '../../../lib/signalGenerator';
+import { searchCoins, SYMBOL_MAP } from '../../../lib/signalGenerator';
 import { Redis } from '@upstash/redis';
 
 const SEARCH_CACHE = new Map();
@@ -41,6 +41,29 @@ function normalizeKeyword(raw) {
 
 function cacheKey(keyword, limit) {
   return `${REMOTE_CACHE_PREFIX}${keyword}|${limit}`;
+}
+
+function buildStaticFallback(keyword, limit) {
+  const q = String(keyword || '').toLowerCase();
+  const rows = Object.entries(SYMBOL_MAP).map(([pair, meta]) => {
+    const symbol = String(pair).replace(/USDT$/, '');
+    return {
+      id: meta.geckoId || symbol.toLowerCase(),
+      name: meta.name || symbol,
+      symbol,
+      pair,
+      marketCapRank: null,
+      thumb: '',
+    };
+  });
+  return rows
+    .filter((coin) => {
+      if (!q) return true;
+      return coin.name.toLowerCase().includes(q)
+        || coin.symbol.toLowerCase().includes(q)
+        || coin.id.toLowerCase().includes(q);
+    })
+    .slice(0, limit);
 }
 
 function sanitizeCacheEntry(raw) {
@@ -182,6 +205,16 @@ export default async function handler(req, res) {
       res.setHeader('X-Cache', 'STALE_FALLBACK');
       res.setHeader('Cache-Control', `public, s-maxage=${EDGE_STALE_FALLBACK_S}, stale-while-revalidate=${EDGE_STALE_FALLBACK_REVALIDATE_S}`);
       return res.status(200).json({ coins: staleFallback.coins, cached: true, stale: true });
+    }
+    const fallbackCoins = buildStaticFallback(keyword, safeLimit);
+    if (fallbackCoins.length) {
+      res.setHeader('X-Cache', 'STATIC_FALLBACK');
+      res.setHeader('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=120');
+      return res.status(200).json({
+        coins: fallbackCoins,
+        cached: false,
+        fallback: 'static',
+      });
     }
     return res.status(500).json({ error: 'Coin search failed', details: err.message });
   }
