@@ -1,19 +1,275 @@
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap');
 
 :root {
-  --bg: #0f1c12;
+  --bg-core: #0f1c12;
   --bg-deep: #0a130d;
-  --card: #14261a;
-  --card-soft: #1a3122;
-  --border: #3d604a;
-  --chalk: #d8f0d6;
-  --chalk-dim: #92b295;
-  --chalk-accent: #7ef7bd;
-  --chalk-blue: #89d6ff;
-  --chalk-green: #9cff97;
-  --chalk-red: #ff8c8c;
-  --chalk-yellow: #ffd37c;
-  --shadow: #061008;
+  --bg-radial-a: rgba(126, 247, 189, 0.07);
+  --bg-radial-b: rgba(137, 214, 255, 0.07);
+  --bg-grid-line: rgba(255, 255, 255, 0.015);
+
+  --text: #d8f0d6;
+  --text-dim: #92b295;
+  --text-accent: #7ef7bd;
+  --text-blue: #89d6ff;
+  --text-green: #9cff97;
+  --text-red: #ff8c8c;
+  --text-yellow: #ffd37c;
+
+  --panel-gradient-a: #14261a;
+  --panel-gradient-b: #102016;
+  --panel-flat: #101b13;
+  --panel-border: #3d604a;
+  --panel-border-soft: #2d4a37;
+  --panel-shadow: #061008;
+  --panel-outline: rgba(126, 247, 189, 0.22);
+  --panel-dashed: #2d4835;
+
+  --input-bg: #0f1b13;
+  --input-border: #2f4a38;
+  --input-focus-glow: rgba(126, 247, 189, 0.15);
+
+  --button-a: #20422a;
+  --button-b: #183721;
+  --button-border: #5a7c5e;
+
+  --signal-buy-bg: #9cff97;
+  --signal-buy-text: #0f2912;
+  --signal-buy-border: #5da861;
+  --signal-sell-bg: #ff8c8c;
+  --signal-sell-text: #30110f;
+  --signal-sell-border: #ba6363;
+  --signal-hold-bg: #ffd37c;
+  --signal-hold-text: #39270d;
+  --signal-hold-border: #b89252;
+
+  --confidence-buy-a: #62d86b;
+  --confidence-buy-b: #b6ff9f;
+  --confidence-sell-a: #da6161;
+  --confidence-sell-b: #ff9797;
+  --confidence-hold-a: #d6af58;
+  --confidence-hold-b: #ffda8a;
+
+  --quality-fill-a: #76f2b6;
+  --quality-fill-b: #8abfff;
+
+  --rr-border: #547d60;
+  --rr-bg: #15281b;
+
+  --disclaimer-border: #7a7040;
+  --disclaimer-bg: rgba(63, 54, 22, 0.25);
+  --disclaimer-text: #efe3ad;
+
+  --pulse-1: #3d604a;
+  --pulse-2: #5f8d70;
+  --pulse-3: #6b6f4a;
+  --pulse-4: #4f7c62;
+
+  --danger: #ff8c8c;
+}
+
+:root[data-theme='chalkboard'] {
+  color-scheme: dark;
+}
+
+:root[data-theme='neon-grid'] {
+  --bg-core: #09111f;
+  --bg-deep: #050913;
+  --bg-radial-a: rgba(0, 234, 255, 0.14);
+  --bg-radial-b: rgba(255, 69, 207, 0.12);
+  --bg-grid-line: rgba(104, 127, 255, 0.08);
+
+  --text: #dbecff;
+  --text-dim: #8ea3c3;
+  --text-accent: #33f2ff;
+  --text-blue: #89a6ff;
+  --text-green: #89ffcf;
+  --text-red: #ff7dbe;
+  --text-yellow: #ffd38f;
+
+  --panel-gradient-a: #111a30;
+  --panel-gradient-b: #0b1326;
+  --panel-flat: #0f1830;
+  --panel-border: #4063b3;
+  --panel-border-soft: #304d92;
+  --panel-shadow: #02040d;
+  --panel-outline: rgba(51, 242, 255, 0.26);
+  --panel-dashed: #365083;
+
+  --input-bg: #0b1326;
+  --input-border: #33518f;
+  --input-focus-glow: rgba(51, 242, 255, 0.26);
+
+  --button-a: #173670;
+  --button-b: #112859;
+  --button-border: #4f7ee6;
+
+  --signal-buy-bg: #89ffcf;
+  --signal-buy-text: #0d2f23;
+  --signal-buy-border: #4ab090;
+  --signal-sell-bg: #ff7dbe;
+  --signal-sell-text: #3b0f31;
+  --signal-sell-border: #c85f96;
+  --signal-hold-bg: #ffd38f;
+  --signal-hold-text: #3f2f15;
+  --signal-hold-border: #c29e5a;
+
+  --confidence-buy-a: #4ce9b0;
+  --confidence-buy-b: #b7ffe6;
+  --confidence-sell-a: #e764a8;
+  --confidence-sell-b: #ffc2df;
+  --confidence-hold-a: #dba65b;
+  --confidence-hold-b: #ffe5b6;
+
+  --quality-fill-a: #33f2ff;
+  --quality-fill-b: #9f77ff;
+
+  --rr-border: #4f7ee6;
+  --rr-bg: #112859;
+
+  --disclaimer-border: #b58c49;
+  --disclaimer-bg: rgba(77, 47, 12, 0.38);
+  --disclaimer-text: #ffe8b8;
+
+  --pulse-1: #4063b3;
+  --pulse-2: #5f8dff;
+  --pulse-3: #8a66ff;
+  --pulse-4: #3cc8ff;
+
+  --danger: #ff7dbe;
+}
+
+:root[data-theme='amber-crt'] {
+  --bg-core: #17120a;
+  --bg-deep: #0d0905;
+  --bg-radial-a: rgba(255, 199, 92, 0.12);
+  --bg-radial-b: rgba(255, 145, 66, 0.1);
+  --bg-grid-line: rgba(255, 224, 158, 0.05);
+
+  --text: #ffe2a1;
+  --text-dim: #bd9b63;
+  --text-accent: #ffd27c;
+  --text-blue: #ffcd82;
+  --text-green: #ffc57f;
+  --text-red: #ff9a7a;
+  --text-yellow: #ffe09c;
+
+  --panel-gradient-a: #2a1f11;
+  --panel-gradient-b: #1d150b;
+  --panel-flat: #20170d;
+  --panel-border: #8a6634;
+  --panel-border-soft: #6d522a;
+  --panel-shadow: #0a0703;
+  --panel-outline: rgba(255, 210, 124, 0.25);
+  --panel-dashed: #71562d;
+
+  --input-bg: #20170d;
+  --input-border: #71562d;
+  --input-focus-glow: rgba(255, 210, 124, 0.26);
+
+  --button-a: #5a3f1b;
+  --button-b: #3f2c11;
+  --button-border: #ad8042;
+
+  --signal-buy-bg: #ffcf88;
+  --signal-buy-text: #3a2411;
+  --signal-buy-border: #c3934d;
+  --signal-sell-bg: #ff9a7a;
+  --signal-sell-text: #4c1a10;
+  --signal-sell-border: #c26d54;
+  --signal-hold-bg: #ffe09c;
+  --signal-hold-text: #4a3415;
+  --signal-hold-border: #c8a761;
+
+  --confidence-buy-a: #ffbd5f;
+  --confidence-buy-b: #ffe5b3;
+  --confidence-sell-a: #ea8468;
+  --confidence-sell-b: #ffccb7;
+  --confidence-hold-a: #d6af58;
+  --confidence-hold-b: #ffe2a6;
+
+  --quality-fill-a: #ffbe64;
+  --quality-fill-b: #ffd27c;
+
+  --rr-border: #ad8042;
+  --rr-bg: #3f2c11;
+
+  --disclaimer-border: #be8a43;
+  --disclaimer-bg: rgba(99, 69, 28, 0.35);
+  --disclaimer-text: #ffe8bc;
+
+  --pulse-1: #8a6634;
+  --pulse-2: #ad8042;
+  --pulse-3: #c99a53;
+  --pulse-4: #946e35;
+
+  --danger: #ff9a7a;
+}
+
+:root[data-theme='frost-byte'] {
+  --bg-core: #0b1824;
+  --bg-deep: #060d16;
+  --bg-radial-a: rgba(130, 209, 255, 0.16);
+  --bg-radial-b: rgba(117, 159, 255, 0.12);
+  --bg-grid-line: rgba(190, 228, 255, 0.05);
+
+  --text: #dff4ff;
+  --text-dim: #8cb0c6;
+  --text-accent: #8cd8ff;
+  --text-blue: #9ec1ff;
+  --text-green: #9ff0dd;
+  --text-red: #ff9dc0;
+  --text-yellow: #ffe2a2;
+
+  --panel-gradient-a: #112435;
+  --panel-gradient-b: #0b1a29;
+  --panel-flat: #0e1f31;
+  --panel-border: #3f6f95;
+  --panel-border-soft: #2f5978;
+  --panel-shadow: #03070d;
+  --panel-outline: rgba(140, 216, 255, 0.26);
+  --panel-dashed: #375f7f;
+
+  --input-bg: #0e1f31;
+  --input-border: #375f7f;
+  --input-focus-glow: rgba(140, 216, 255, 0.26);
+
+  --button-a: #21466d;
+  --button-b: #193754;
+  --button-border: #5e95cb;
+
+  --signal-buy-bg: #9ff0dd;
+  --signal-buy-text: #10362d;
+  --signal-buy-border: #5fa897;
+  --signal-sell-bg: #ff9dc0;
+  --signal-sell-text: #3f1730;
+  --signal-sell-border: #bd7190;
+  --signal-hold-bg: #ffe2a2;
+  --signal-hold-text: #4a3717;
+  --signal-hold-border: #c4a467;
+
+  --confidence-buy-a: #5adcbf;
+  --confidence-buy-b: #c8fff1;
+  --confidence-sell-a: #e4769e;
+  --confidence-sell-b: #ffcbe0;
+  --confidence-hold-a: #d9b35f;
+  --confidence-hold-b: #ffe7b8;
+
+  --quality-fill-a: #86d4ff;
+  --quality-fill-b: #98b6ff;
+
+  --rr-border: #5e95cb;
+  --rr-bg: #193754;
+
+  --disclaimer-border: #8b7c4e;
+  --disclaimer-bg: rgba(68, 55, 28, 0.34);
+  --disclaimer-text: #fbe7b8;
+
+  --pulse-1: #3f6f95;
+  --pulse-2: #5e95cb;
+  --pulse-3: #86b5e4;
+  --pulse-4: #4f86b8;
+
+  --danger: #ff9dc0;
 }
 
 * {
@@ -25,17 +281,17 @@
 body {
   font-family: 'VT323', monospace;
   background:
-    radial-gradient(circle at 10% 5%, rgba(126, 247, 189, 0.07), transparent 38%),
-    radial-gradient(circle at 90% 12%, rgba(137, 214, 255, 0.07), transparent 34%),
+    radial-gradient(circle at 10% 5%, var(--bg-radial-a), transparent 38%),
+    radial-gradient(circle at 90% 12%, var(--bg-radial-b), transparent 34%),
     repeating-linear-gradient(
       0deg,
-      rgba(255, 255, 255, 0.015) 0px,
-      rgba(255, 255, 255, 0.015) 2px,
+      var(--bg-grid-line) 0px,
+      var(--bg-grid-line) 2px,
       transparent 2px,
       transparent 5px
     ),
-    linear-gradient(180deg, var(--bg), var(--bg-deep));
-  color: var(--chalk);
+    linear-gradient(180deg, var(--bg-core), var(--bg-deep));
+  color: var(--text);
   min-height: 100vh;
   line-height: 1.25;
   letter-spacing: 0.4px;
@@ -43,20 +299,20 @@ body {
 
 @keyframes pixelBorderPulse {
   0%, 100% {
-    border-color: #3d604a;
-    outline-color: rgba(126, 247, 189, 0.22);
+    border-color: var(--pulse-1);
+    outline-color: var(--panel-outline);
   }
   25% {
-    border-color: #5f8d70;
-    outline-color: rgba(137, 214, 255, 0.22);
+    border-color: var(--pulse-2);
+    outline-color: var(--panel-outline);
   }
   50% {
-    border-color: #6b6f4a;
-    outline-color: rgba(255, 211, 124, 0.22);
+    border-color: var(--pulse-3);
+    outline-color: var(--panel-outline);
   }
   75% {
-    border-color: #4f7c62;
-    outline-color: rgba(156, 255, 151, 0.2);
+    border-color: var(--pulse-4);
+    outline-color: var(--panel-outline);
   }
 }
 
@@ -84,21 +340,21 @@ body {
 .header h1 {
   font-family: 'Press Start 2P', cursive;
   font-size: 22px;
-  color: var(--chalk-accent);
+  color: var(--text-accent);
   line-height: 1.3;
-  text-shadow: 0 0 8px rgba(126, 247, 189, 0.25);
+  text-shadow: 0 0 8px var(--text-accent);
   margin-bottom: 12px;
 }
 
 .header p {
-  color: var(--chalk-dim);
+  color: var(--text-dim);
   font-size: 30px;
 }
 
 .form-card {
-  background: linear-gradient(180deg, var(--card), #102016);
-  border: 2px solid var(--border);
-  box-shadow: 0 0 0 2px var(--shadow), 6px 6px 0 var(--shadow);
+  background: linear-gradient(180deg, var(--panel-gradient-a), var(--panel-gradient-b));
+  border: 2px solid var(--panel-border);
+  box-shadow: 0 0 0 2px var(--panel-shadow), 6px 6px 0 var(--panel-shadow);
   border-radius: 0;
   padding: 18px;
   margin-bottom: 18px;
@@ -114,16 +370,16 @@ body {
   display: block;
   font-family: 'Press Start 2P', cursive;
   font-size: 10px;
-  color: var(--chalk-blue);
+  color: var(--text-blue);
   margin-bottom: 8px;
   text-transform: uppercase;
 }
 
 .form-group select {
   width: 100%;
-  background: #0f1b13;
-  border: 2px solid #2f4a38;
-  color: var(--chalk);
+  background: var(--input-bg);
+  border: 2px solid var(--input-border);
+  color: var(--text);
   font-family: 'VT323', monospace;
   font-size: 28px;
   padding: 8px 10px;
@@ -132,22 +388,22 @@ body {
 
 .form-group select:focus {
   outline: none;
-  border-color: var(--chalk-accent);
-  box-shadow: 0 0 0 2px rgba(126, 247, 189, 0.15);
+  border-color: var(--text-accent);
+  box-shadow: 0 0 0 2px var(--input-focus-glow);
 }
 
 .btn-generate {
   width: 100%;
   margin-top: 14px;
-  border: 2px solid #5a7c5e;
-  background: linear-gradient(180deg, #20422a, #183721);
-  color: var(--chalk);
+  border: 2px solid var(--button-border);
+  background: linear-gradient(180deg, var(--button-a), var(--button-b));
+  color: var(--text);
   font-family: 'Press Start 2P', cursive;
   font-size: 12px;
   padding: 14px 10px;
   cursor: pointer;
   text-transform: uppercase;
-  box-shadow: 0 4px 0 var(--shadow);
+  box-shadow: 0 4px 0 var(--panel-shadow);
   transition: transform 0.08s ease, filter 0.08s ease;
 }
 
@@ -157,7 +413,7 @@ body {
 
 .btn-generate:active {
   transform: translateY(2px);
-  box-shadow: 0 2px 0 var(--shadow);
+  box-shadow: 0 2px 0 var(--panel-shadow);
 }
 
 .btn-generate:disabled {
@@ -183,26 +439,26 @@ body {
 }
 
 .signal-badge.buy {
-  color: #0f2912;
-  background: var(--chalk-green);
-  border-color: #5da861;
+  color: var(--signal-buy-text);
+  background: var(--signal-buy-bg);
+  border-color: var(--signal-buy-border);
 }
 
 .signal-badge.sell {
-  color: #30110f;
-  background: var(--chalk-red);
-  border-color: #ba6363;
+  color: var(--signal-sell-text);
+  background: var(--signal-sell-bg);
+  border-color: var(--signal-sell-border);
 }
 
 .signal-badge.hold {
-  color: #39270d;
-  background: var(--chalk-yellow);
-  border-color: #b89252;
+  color: var(--signal-hold-text);
+  background: var(--signal-hold-bg);
+  border-color: var(--signal-hold-border);
 }
 
 .signal-meta {
   text-align: right;
-  color: var(--chalk-dim);
+  color: var(--text-dim);
   font-size: 25px;
 }
 
@@ -214,7 +470,7 @@ body {
   display: flex;
   justify-content: space-between;
   font-family: 'Press Start 2P', cursive;
-  color: var(--chalk-blue);
+  color: var(--text-blue);
   font-size: 10px;
   margin-bottom: 7px;
 }
@@ -222,8 +478,8 @@ body {
 .confidence-bar,
 .quality-bar {
   height: 16px;
-  border: 2px solid #31503c;
-  background: #0d170f;
+  border: 2px solid var(--panel-border-soft);
+  background: var(--panel-flat);
   overflow: hidden;
 }
 
@@ -231,13 +487,13 @@ body {
   height: 100%;
 }
 
-.confidence-fill.buy { background: linear-gradient(90deg, #62d86b, #b6ff9f); }
-.confidence-fill.sell { background: linear-gradient(90deg, #da6161, #ff9797); }
-.confidence-fill.hold { background: linear-gradient(90deg, #d6af58, #ffda8a); }
+.confidence-fill.buy { background: linear-gradient(90deg, var(--confidence-buy-a), var(--confidence-buy-b)); }
+.confidence-fill.sell { background: linear-gradient(90deg, var(--confidence-sell-a), var(--confidence-sell-b)); }
+.confidence-fill.hold { background: linear-gradient(90deg, var(--confidence-hold-a), var(--confidence-hold-b)); }
 
 .quality-panel {
-  border: 2px solid #35553f;
-  background: rgba(10, 19, 13, 0.75);
+  border: 2px solid var(--panel-border-soft);
+  background: var(--panel-flat);
   padding: 12px;
   margin-bottom: 10px;
 }
@@ -253,38 +509,38 @@ body {
 .quality-title {
   font-family: 'Press Start 2P', cursive;
   font-size: 10px;
-  color: var(--chalk-blue);
+  color: var(--text-blue);
   line-height: 1.5;
 }
 
 .quality-sub {
-  color: var(--chalk-dim);
+  color: var(--text-dim);
   font-size: 24px;
 }
 
 .quality-score {
   font-family: 'Press Start 2P', cursive;
   font-size: 16px;
-  color: var(--chalk-accent);
+  color: var(--text-accent);
   white-space: nowrap;
   text-align: right;
 }
 
 .quality-score span {
   font-size: 10px;
-  color: var(--chalk-yellow);
+  color: var(--text-yellow);
 }
 
 .quality-fill {
   height: 100%;
-  background: linear-gradient(90deg, #76f2b6, #8abfff);
+  background: linear-gradient(90deg, var(--quality-fill-a), var(--quality-fill-b));
 }
 
 .quality-metrics {
   display: flex;
   flex-wrap: wrap;
   gap: 8px 18px;
-  color: var(--chalk-dim);
+  color: var(--text-dim);
   font-size: 24px;
   margin-top: 8px;
 }
@@ -294,7 +550,7 @@ body {
   justify-content: space-between;
   align-items: center;
   gap: 8px;
-  border-top: 1px dashed #2d4835;
+  border-top: 1px dashed var(--panel-dashed);
   padding-top: 7px;
   margin-top: 7px;
   font-size: 24px;
@@ -304,13 +560,13 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  border: 2px solid #41664b;
-  background: #0e1912;
+  border: 2px solid var(--panel-border);
+  background: var(--panel-flat);
   font-family: 'Press Start 2P', cursive;
   font-size: 20px;
   padding: 18px 10px;
   margin-bottom: 18px;
-  color: var(--chalk-yellow);
+  color: var(--text-yellow);
 }
 
 .levels-table {
@@ -324,23 +580,23 @@ body {
   text-align: left;
   font-family: 'Press Start 2P', cursive;
   font-size: 9px;
-  color: var(--chalk-blue);
+  color: var(--text-blue);
   padding: 6px 7px;
 }
 
 .levels-table td {
-  background: #101b13;
-  border: 1px solid #2a4332;
+  background: var(--panel-flat);
+  border: 1px solid var(--panel-border-soft);
   padding: 7px 8px;
   font-size: 24px;
 }
 
-.pct-pos { color: var(--chalk-green); }
-.pct-neg { color: var(--chalk-red); }
+.pct-pos { color: var(--text-green); }
+.pct-neg { color: var(--text-red); }
 
 .reasons-section h3 {
   font-family: 'Press Start 2P', cursive;
-  color: var(--chalk-blue);
+  color: var(--text-blue);
   font-size: 10px;
   margin-bottom: 8px;
 }
@@ -349,8 +605,8 @@ body {
   display: flex;
   gap: 8px;
   align-items: flex-start;
-  border: 2px solid #32503d;
-  background: rgba(17, 29, 20, 0.82);
+  border: 2px solid var(--panel-border-soft);
+  background: var(--panel-flat);
   margin-bottom: 6px;
   padding: 8px 10px;
   font-size: 24px;
@@ -364,22 +620,22 @@ body {
 }
 
 .indicator-card {
-  border: 2px solid #2d4a37;
-  background: #101b13;
+  border: 2px solid var(--panel-border-soft);
+  background: var(--panel-flat);
   padding: 10px 9px;
 }
 
 .indicator-card .label {
   font-family: 'Press Start 2P', cursive;
   font-size: 9px;
-  color: var(--chalk-blue);
+  color: var(--text-blue);
   margin-bottom: 7px;
   line-height: 1.4;
 }
 
 .indicator-card .value {
   font-size: 27px;
-  color: var(--chalk);
+  color: var(--text);
 }
 
 .rr-badge {
@@ -388,16 +644,16 @@ body {
   padding: 6px 10px;
   font-family: 'Press Start 2P', cursive;
   font-size: 10px;
-  border: 2px solid #547d60;
-  background: #15281b;
-  color: var(--chalk-accent);
+  border: 2px solid var(--rr-border);
+  background: var(--rr-bg);
+  color: var(--text-accent);
 }
 
 .disclaimer {
   margin-top: 16px;
-  border: 2px solid #7a7040;
-  background: rgba(63, 54, 22, 0.25);
-  color: #efe3ad;
+  border: 2px solid var(--disclaimer-border);
+  background: var(--disclaimer-bg);
+  color: var(--disclaimer-text);
   padding: 9px 11px;
   font-size: 22px;
 }
@@ -408,15 +664,15 @@ body {
   align-items: center;
   gap: 14px;
   padding: 44px 0;
-  color: var(--chalk-dim);
+  color: var(--text-dim);
   font-size: 24px;
 }
 
 .spinner {
   width: 34px;
   height: 34px;
-  border: 4px solid #294236;
-  border-top-color: var(--chalk-accent);
+  border: 4px solid var(--panel-border-soft);
+  border-top-color: var(--text-accent);
   image-rendering: pixelated;
   animation: spin 0.9s linear infinite;
 }
@@ -428,12 +684,12 @@ body {
 .footer {
   text-align: center;
   padding-top: 18px;
-  color: var(--chalk-dim);
+  color: var(--text-dim);
   font-size: 22px;
 }
 
 .footer a {
-  color: var(--chalk-blue);
+  color: var(--text-blue);
   text-decoration: none;
 }
 

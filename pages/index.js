@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Head from 'next/head';
 
 const COINS = [
@@ -29,6 +29,13 @@ const RISK_LEVELS = [
   { value: 'conservative', label: 'Conservative' },
   { value: 'moderate', label: 'Moderate' },
   { value: 'aggressive', label: 'Aggressive' },
+];
+
+const THEMES = [
+  { value: 'chalkboard', label: 'Chalkboard Pixel' },
+  { value: 'neon-grid', label: 'Neon Grid' },
+  { value: 'amber-crt', label: 'Amber CRT' },
+  { value: 'frost-byte', label: 'Frost Byte' },
 ];
 
 function fmt(n, decimals) {
@@ -68,9 +75,26 @@ export default function Home() {
   const [timeframe, setTimeframe] = useState('4h');
   const [signalType, setSignalType] = useState('swing');
   const [riskTolerance, setRiskTolerance] = useState('moderate');
+  const [theme, setTheme] = useState('chalkboard');
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const savedTheme = window.localStorage.getItem('ui-theme');
+    if (savedTheme && THEMES.some((t) => t.value === savedTheme)) {
+      setTheme(savedTheme);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+    document.documentElement.setAttribute('data-theme', theme);
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem('ui-theme', theme);
+    }
+  }, [theme]);
 
   async function generate() {
     setLoading(true);
@@ -92,13 +116,13 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>Crypto Futures Signal</title>
+        <title>Catalyst8 Signal</title>
       </Head>
 
       <div className="container">
         {/* Header */}
         <header className="header">
-          <h1>Crypto Futures Signal</h1>
+          <h1>Catalyst8 Signal</h1>
           <p>Futures intelligence with technical confluence, catalyst watch, and liquidity heat map</p>
         </header>
 
@@ -127,6 +151,12 @@ export default function Home() {
               <label>Risk Tolerance</label>
               <select value={riskTolerance} onChange={(e) => setRiskTolerance(e.target.value)}>
                 {RISK_LEVELS.map((r) => <option key={r.value} value={r.value}>{r.label}</option>)}
+              </select>
+            </div>
+            <div className="form-group">
+              <label>Theme</label>
+              <select value={theme} onChange={(e) => setTheme(e.target.value)}>
+                {THEMES.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
               </select>
             </div>
           </div>
@@ -511,7 +541,7 @@ export default function Home() {
 
         {/* Footer */}
         <footer className="footer">
-          Crypto Futures Signal Agent &mdash; Built for{' '}
+          Catalyst8 Signal &mdash; Built for{' '}
           <a href="https://avalon-vibe.devpost.com/" target="_blank" rel="noopener noreferrer">Avalon Vibe Hackathon 2026</a>
           {' '}&middot; Powered by <a href="https://creao.ai" target="_blank" rel="noopener noreferrer">CREAO</a>
         </footer>

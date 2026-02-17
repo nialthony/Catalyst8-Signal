@@ -1,4 +1,4 @@
-# 🚀 Crypto Futures Signal
+# 🚀 Catalyst8 Signal
 
 **AI-powered cryptocurrency futures signal generator with technical + catalyst intelligence**
 
