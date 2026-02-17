@@ -36,7 +36,7 @@ A sophisticated web application that analyzes cryptocurrency markets in real-tim
 - **Catalyst Watch**: News sentiment + trending topic boost
 - **Liquidity Heat Map**: High-liquidity support/resistance node detection
 - **Signal Confluence Scoring**: Combines technical + derivatives + catalyst context
-- **Real-time Data**: CoinGecko API with automatic demo-data fallback
+- **Real-time Data**: CoinGecko SDK API with automatic demo-data fallback
 
 ### 📊 Signal Output
 
@@ -58,7 +58,7 @@ Each signal includes:
 - **Frontend**: Next.js 14 + React 18
 - **API**: Serverless functions on Vercel
 - **Styling**: Custom CSS with dark theme
-- **Data Sources**: CoinGecko API → Demo data fallback
+- **Data Sources**: CoinGecko SDK API → Demo data fallback
 - **Deployment**: Vercel (zero-config deployment)
 
 ### Project Structure
@@ -99,8 +99,16 @@ cd Crypto-Spot-Signal
 # Install dependencies
 npm install
 
-# Optional (recommended): set CoinGecko API key for higher request limits
+# Optional (recommended): set CoinGecko SDK API key for higher request limits
+# Backward-compatible env:
 echo COINGECKO_API_KEY=your_key_here > .env.local
+
+# Preferred explicit env for SDK auth mode:
+echo COINGECKO_API_ENV=demo >> .env.local
+echo COINGECKO_DEMO_API_KEY=your_demo_key_here >> .env.local
+# For Pro plan, use:
+# echo COINGECKO_API_ENV=pro >> .env.local
+# echo COINGECKO_PRO_API_KEY=your_pro_key_here >> .env.local
 
 # Optional: tune search-cache behavior (milliseconds)
 echo COIN_SEARCH_CACHE_TTL_MS=1200000 >> .env.local
