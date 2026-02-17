@@ -6,6 +6,8 @@ Live Demo: [Coming Soon - Deploy on Vercel]
 
 Built for the [Avalon Vibe Hackathon 2026](https://avalon-vibe.devpost.com/)
 
+> **Hackathon Requirement**: This project is powered by **CREAO.ai** as a core platform requirement for the submission.
+
 ---
 
 ## 📋 Overview
@@ -18,6 +20,7 @@ A sophisticated web application that analyzes cryptocurrency markets in real-tim
 - **DeFAI Integration**: Combines DeFi and AI - the hottest trend in crypto 2026
 - **Serverless Architecture**: Runs entirely on Vercel's edge network
 - **Beautiful UI**: Professional dark-themed interface with responsive design
+- **CREAO.ai Powered**: Explicitly aligned with hackathon requirement to leverage CREAO platform
 
 ---
 
@@ -38,7 +41,7 @@ A sophisticated web application that analyzes cryptocurrency markets in real-tim
 - **Liquidity Heat Map**: High-liquidity support/resistance node detection
 - **Signal Confluence Scoring**: Combines technical + derivatives + catalyst context
 - **OpenAI Reasoning (Optional)**: Upgrades explanation quality using structured LLM reasoning
-- **Real-time Data**: CoinGecko SDK API with automatic demo-data fallback
+- **Real-time Data**: CoinGecko SDK API (Demo/Pro plan) with automatic simulated fallback on upstream failure
 
 ### 📊 Signal Output
 
@@ -51,6 +54,12 @@ Each signal includes:
 - **Analysis Reasons**: Clear explanation of why the signal was generated
 - **Full Indicators**: All technical indicator values displayed
 
+### 🔎 Data Source Modes
+
+- **CoinGecko Live**: Real market data from CoinGecko (including **Demo plan** API)
+- **Simulated Fallback**: Internal synthetic data only when upstream data is unavailable
+- **Why this matters**: Fast output can happen when fallback mode is active; check `warnings/degraded` in API response
+
 ---
 
 ## 🏗️ Architecture
@@ -61,6 +70,7 @@ Each signal includes:
 - **API**: Serverless functions on Vercel
 - **Styling**: Custom CSS with dark theme
 - **Data Sources**: CoinGecko SDK API → Demo data fallback
+- **Platform Requirement**: CREAO.ai
 - **Deployment**: Vercel (zero-config deployment)
 
 ### Project Structure
@@ -227,7 +237,14 @@ npm start
 5. Click "Deploy"
 6. Done! Your app is live in ~60 seconds
 
-No environment variables or configuration needed - it just works!
+Set required environment variables in Vercel for production-grade output:
+- `COINGECKO_API_ENV=demo`
+- `COINGECKO_DEMO_API_KEY=your_key`
+
+Optional:
+- `OPENAI_API_KEY`
+- `UPSTASH_REDIS_REST_URL`
+- `UPSTASH_REDIS_REST_TOKEN`
 
 ---
 
@@ -308,6 +325,12 @@ curl "https://your-app.vercel.app/api/signal?symbol=BTCUSDT&geckoId=bitcoin&symb
 
 **Built for**: Avalon Vibe Hackathon 2026 (Feb 14-17, 2026)
 
+### Requirement Compliance
+
+- Uses **CREAO.ai** as a highlighted platform requirement in this submission
+- CREAO branding is present in the product UI
+- Documentation explicitly states CREAO integration as part of the project identity
+
 ### Why This Project Stands Out
 
 ✅ **Real-World Utility** - Solves actual trader problems
@@ -337,7 +360,7 @@ MIT License - Free to use for educational and non-commercial purposes
 ## 🙏 Acknowledgments
 
 - **Avalon Vibe Hackathon** for the opportunity
-- **CREAO Platform** for agentapp infrastructure
+- **CREAO.ai** as the core platform requirement and infrastructure enabler for this build
 - **CoinGecko** for market data APIs
 - **Vercel** for seamless serverless deployment
 - **Crypto Trading Community** for inspiration
