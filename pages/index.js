@@ -265,6 +265,25 @@ export default function Home() {
         </div>
         <div className="terminal-screen">
           <div className="container">
+            <div className="sponsor-bar">
+              <span className="sponsor-label">Sponsored by</span>
+              <a
+                className="sponsor-link"
+                href="https://creao.ai"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="CREAO sponsor"
+              >
+                <img
+                  src="https://creao.ai/favicon.ico"
+                  alt="CREAO logo"
+                  width="18"
+                  height="18"
+                />
+                <span>creao.ai</span>
+              </a>
+            </div>
+
             {/* Header */}
             <header className="header terminal-header">
               <p className="terminal-line">$ boot catalyst8-signal --mode futures</p>
@@ -317,29 +336,6 @@ export default function Home() {
         {/* Form */}
         <div className="form-card">
           <div className="form-grid">
-            <div className="form-group">
-              <label>Selected Coin</label>
-              <div className="coin-search-wrap">
-                <input
-                  className="coin-search-input"
-                  type="text"
-                  value={coinQuery}
-                  onChange={(e) => {
-                    setCoinQuery(e.target.value);
-                    setSelectedCoin(null);
-                    setCoinSuggestions([]);
-                    setShowSuggestions(false);
-                  }}
-                  placeholder="Set by command above, or type manually (e.g. BTC)"
-                  autoComplete="off"
-                />
-              </div>
-              <div className="coin-hint">
-                {selectedCoin
-                  ? `Selected: ${selectedCoin.name} (${selectedCoin.symbol})`
-                  : 'Use terminal command: analyze [symbol], then select one of 5 suggestions'}
-              </div>
-            </div>
             <div className="form-group">
               <label>Timeframe</label>
               <select value={timeframe} onChange={(e) => setTimeframe(e.target.value)}>
