@@ -284,8 +284,8 @@ export default function Home() {
                     className="sponsor-logo"
                     src="/creao-logo.svg"
                     alt="CREAO logo"
-                    width="30"
-                    height="30"
+                    width="60"
+                    height="60"
                   />
                 </a>
               </div>
