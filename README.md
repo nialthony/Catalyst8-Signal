@@ -27,6 +27,8 @@ A sophisticated web application that analyzes cryptocurrency markets in real-tim
 
 - **Multi-Indicator Analysis**: RSI, MACD, Bollinger Bands, EMA20, EMA50, ATR, Momentum
 - **Dynamic Coin Search**: Type any coin name/symbol and get related suggestions
+- **Layered Search Caching**: Debounce + browser session cache + API stale cache fallback
+- **Distributed Cache Ready**: Optional Upstash Redis cache for multi-instance deployments
 - **4 Timeframes**: 15-minute, 1-hour, 4-hour, daily charts
 - **3 Trading Styles**: Scalp (1-2%), Intraday (2-4%), Swing (3-8%)
 - **Risk Tolerance Levels**: Conservative, Moderate, Aggressive
@@ -70,7 +72,8 @@ crypto-futures-signal/
 │   ├── _document.js            # HTML document structure
 │   ├── index.js                # Main UI component
 │   └── api/
-│       └── signal.js           # Serverless API endpoint
+│       ├── signal.js           # Signal generation endpoint
+│       └── coins/search.js     # CoinGecko-powered search endpoint (cached)
 ├── styles/
 │   └── globals.css             # Dark-themed global styles
 ├── package.json                # Dependencies
@@ -98,6 +101,14 @@ npm install
 
 # Optional (recommended): set CoinGecko API key for higher request limits
 echo COINGECKO_API_KEY=your_key_here > .env.local
+
+# Optional: tune search-cache behavior (milliseconds)
+echo COIN_SEARCH_CACHE_TTL_MS=600000 >> .env.local
+echo COIN_SEARCH_CACHE_STALE_TTL_MS=3600000 >> .env.local
+
+# Optional (production): Upstash Redis distributed cache
+echo UPSTASH_REDIS_REST_URL=https://your-upstash-endpoint >> .env.local
+echo UPSTASH_REDIS_REST_TOKEN=your_upstash_token >> .env.local
 
 # Run development server
 npm run dev

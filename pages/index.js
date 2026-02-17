@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Head from 'next/head';
 
 const DEFAULT_COIN = {
@@ -7,6 +7,7 @@ const DEFAULT_COIN = {
   symbol: 'BTC',
   pair: 'BTCUSDT',
 };
+const COIN_SEARCH_CACHE_TTL_MS = 5 * 60 * 1000;
 
 const TIMEFRAMES = [
   { value: '15m', label: '15 Min' },
@@ -73,6 +74,7 @@ function normalizeSymbolText(raw) {
 }
 
 export default function Home() {
+  const coinSearchCacheRef = useRef(new Map());
   const [coinQuery, setCoinQuery] = useState(DEFAULT_COIN.name);
   const [selectedCoin, setSelectedCoin] = useState(DEFAULT_COIN);
   const [coinSuggestions, setCoinSuggestions] = useState([]);
@@ -112,13 +114,30 @@ export default function Home() {
 
     const controller = new AbortController();
     const timer = setTimeout(async () => {
+      const normalizedKeyword = keyword.toLowerCase();
+      const now = Date.now();
+      const cached = coinSearchCacheRef.current.get(normalizedKeyword);
+      if (cached && cached.expiresAt > now) {
+        setCoinSuggestions(cached.coins);
+        return;
+      }
+
       setSearchingCoins(true);
       try {
         const params = new URLSearchParams({ q: keyword, limit: '8' });
         const res = await fetch(`/api/coins/search?${params}`, { signal: controller.signal });
         if (!res.ok) throw new Error('Search request failed');
         const payload = await res.json();
-        setCoinSuggestions(payload.coins || []);
+        const coins = payload.coins || [];
+        setCoinSuggestions(coins);
+        coinSearchCacheRef.current.set(normalizedKeyword, {
+          coins,
+          expiresAt: now + COIN_SEARCH_CACHE_TTL_MS,
+        });
+        if (coinSearchCacheRef.current.size > 120) {
+          const oldest = coinSearchCacheRef.current.keys().next().value;
+          if (oldest) coinSearchCacheRef.current.delete(oldest);
+        }
       } catch {
         if (!controller.signal.aborted) setCoinSuggestions([]);
       } finally {

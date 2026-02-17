@@ -1,4 +1,123 @@
 import { searchCoins } from '../../../lib/signalGenerator';
+import { Redis } from '@upstash/redis';
+
+const SEARCH_CACHE = new Map();
+const INFLIGHT = new Map();
+const MAX_CACHE_ITEMS = 400;
+const CACHE_TTL_MS = Number(process.env.COIN_SEARCH_CACHE_TTL_MS || 10 * 60 * 1000);
+const STALE_TTL_MS = Number(process.env.COIN_SEARCH_CACHE_STALE_TTL_MS || 60 * 60 * 1000);
+const REMOTE_CACHE_PREFIX = 'coin-search:v1:';
+const redis = process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN
+  ? new Redis({
+      url: process.env.UPSTASH_REDIS_REST_URL,
+      token: process.env.UPSTASH_REDIS_REST_TOKEN,
+    })
+  : null;
+
+function normalizeKeyword(raw) {
+  return String(raw || '')
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, ' ');
+}
+
+function cacheKey(keyword, limit) {
+  return `${REMOTE_CACHE_PREFIX}${keyword}|${limit}`;
+}
+
+function sanitizeCacheEntry(raw) {
+  if (!raw) return null;
+  let item = raw;
+  if (typeof item === 'string') {
+    try {
+      item = JSON.parse(item);
+    } catch {
+      return null;
+    }
+  }
+  if (!item || !Array.isArray(item.coins)) return null;
+  const createdAt = Number(item.createdAt) || Date.now();
+  const expiresAt = Number(item.expiresAt) || createdAt + CACHE_TTL_MS;
+  const staleUntil = Number(item.staleUntil) || createdAt + STALE_TTL_MS;
+  return {
+    coins: item.coins,
+    createdAt,
+    expiresAt,
+    staleUntil,
+  };
+}
+
+function getLocalCacheEntry(key) {
+  const item = SEARCH_CACHE.get(key);
+  if (!item) return null;
+  const now = Date.now();
+  if (item.staleUntil <= now) {
+    SEARCH_CACHE.delete(key);
+    return null;
+  }
+  return item;
+}
+
+function setLocalCacheEntry(key, entry) {
+  SEARCH_CACHE.set(key, entry);
+  if (SEARCH_CACHE.size > MAX_CACHE_ITEMS) {
+    const oldest = SEARCH_CACHE.keys().next().value;
+    if (oldest) SEARCH_CACHE.delete(oldest);
+  }
+}
+
+function buildCacheEntry(coins) {
+  const now = Date.now();
+  return {
+    coins,
+    createdAt: now,
+    expiresAt: now + CACHE_TTL_MS,
+    staleUntil: now + STALE_TTL_MS,
+  };
+}
+
+async function getDistributedCacheEntry(key) {
+  if (!redis) return null;
+  try {
+    const raw = await redis.get(key);
+    const item = sanitizeCacheEntry(raw);
+    if (!item) return null;
+    if (item.staleUntil <= Date.now()) return null;
+    return item;
+  } catch {
+    return null;
+  }
+}
+
+async function setDistributedCacheEntry(key, entry) {
+  if (!redis) return;
+  try {
+    const ttlSeconds = Math.max(60, Math.ceil(STALE_TTL_MS / 1000));
+    await redis.set(key, entry, { ex: ttlSeconds });
+  } catch {}
+}
+
+function pickStaleFallback(primary, secondary) {
+  const now = Date.now();
+  const candidates = [primary, secondary]
+    .map((item) => sanitizeCacheEntry(item))
+    .filter((item) => item && item.staleUntil > now);
+  if (!candidates.length) return null;
+  return candidates.sort((a, b) => b.createdAt - a.createdAt)[0];
+}
+
+async function searchCoinsWithDedup(key, keyword, limit) {
+  if (INFLIGHT.has(key)) return INFLIGHT.get(key);
+  const task = (async () => {
+    try {
+      return await searchCoins(keyword, limit);
+    } finally {
+      INFLIGHT.delete(key);
+    }
+  })();
+  INFLIGHT.set(key, task);
+  return task;
+}
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') {
@@ -6,18 +125,46 @@ export default async function handler(req, res) {
   }
 
   const { q = '', query = '', limit = '10' } = req.query;
-  const keyword = String(q || query || '').trim();
+  const keyword = normalizeKeyword(q || query || '');
   const safeLimit = Math.max(1, Math.min(20, Number(limit) || 10));
+  const key = cacheKey(keyword, safeLimit);
 
   if (!keyword) {
     return res.status(200).json({ coins: [] });
   }
 
+  const localCached = getLocalCacheEntry(key);
+  if (localCached && localCached.expiresAt > Date.now()) {
+    res.setHeader('X-Cache', 'HIT_LOCAL');
+    res.setHeader('Cache-Control', 'public, s-maxage=120, stale-while-revalidate=300');
+    return res.status(200).json({ coins: localCached.coins, cached: true });
+  }
+
+  const remoteCached = await getDistributedCacheEntry(key);
+  if (remoteCached && remoteCached.expiresAt > Date.now()) {
+    setLocalCacheEntry(key, remoteCached);
+    res.setHeader('X-Cache', 'HIT_REMOTE');
+    res.setHeader('Cache-Control', 'public, s-maxage=120, stale-while-revalidate=300');
+    return res.status(200).json({ coins: remoteCached.coins, cached: true });
+  }
+
+  const staleFallback = pickStaleFallback(localCached, remoteCached);
+
   try {
-    const coins = await searchCoins(keyword, safeLimit);
-    res.setHeader('Cache-Control', 's-maxage=120, stale-while-revalidate=300');
-    return res.status(200).json({ coins });
+    const coins = await searchCoinsWithDedup(key, keyword, safeLimit);
+    const nextCache = buildCacheEntry(coins);
+    setLocalCacheEntry(key, nextCache);
+    await setDistributedCacheEntry(key, nextCache);
+    res.setHeader('X-Cache', staleFallback ? 'REFRESHED' : 'MISS');
+    res.setHeader('Cache-Control', 'public, s-maxage=120, stale-while-revalidate=300');
+    return res.status(200).json({ coins, cached: false });
   } catch (err) {
+    if (staleFallback) {
+      setLocalCacheEntry(key, staleFallback);
+      res.setHeader('X-Cache', 'STALE_FALLBACK');
+      res.setHeader('Cache-Control', 'public, s-maxage=30, stale-while-revalidate=120');
+      return res.status(200).json({ coins: staleFallback.coins, cached: true, stale: true });
+    }
     return res.status(500).json({ error: 'Coin search failed', details: err.message });
   }
 }
