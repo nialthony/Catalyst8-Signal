@@ -386,6 +386,94 @@ body {
   appearance: none;
 }
 
+.coin-search-wrap {
+  position: relative;
+}
+
+.coin-search-input {
+  width: 100%;
+  background: var(--input-bg);
+  border: 2px solid var(--input-border);
+  color: var(--text);
+  font-family: 'VT323', monospace;
+  font-size: 28px;
+  padding: 8px 10px;
+}
+
+.coin-search-input:focus {
+  outline: none;
+  border-color: var(--text-accent);
+  box-shadow: 0 0 0 2px var(--input-focus-glow);
+}
+
+.coin-suggestions {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 20;
+  border: 2px solid var(--panel-border);
+  background: var(--panel-flat);
+  box-shadow: 0 0 0 2px var(--panel-shadow), 4px 4px 0 var(--panel-shadow);
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.coin-suggestion {
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid var(--panel-border-soft);
+  background: transparent;
+  color: var(--text);
+  font-family: 'VT323', monospace;
+  font-size: 24px;
+  text-align: left;
+  padding: 8px 10px;
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.coin-suggestion:last-child {
+  border-bottom: none;
+}
+
+.coin-suggestion:hover {
+  background: var(--panel-gradient-a);
+}
+
+.coin-suggestion.muted {
+  color: var(--text-dim);
+  cursor: default;
+}
+
+.coin-main {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.coin-name {
+  color: var(--text);
+}
+
+.coin-symbol {
+  color: var(--text-accent);
+  font-family: 'Press Start 2P', cursive;
+  font-size: 10px;
+}
+
+.coin-meta {
+  color: var(--text-dim);
+}
+
+.coin-hint {
+  color: var(--text-dim);
+  font-size: 20px;
+  margin-top: 6px;
+}
+
 .form-group select:focus {
   outline: none;
   border-color: var(--text-accent);

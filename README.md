@@ -26,7 +26,7 @@ A sophisticated web application that analyzes cryptocurrency markets in real-tim
 ### 🎯 Core Capabilities
 
 - **Multi-Indicator Analysis**: RSI, MACD, Bollinger Bands, EMA20, EMA50, ATR, Momentum
-- **8 Trading Pairs**: BTC, ETH, SOL, BNB, XRP, ADA, AVAX, DOGE
+- **Dynamic Coin Search**: Type any coin name/symbol and get related suggestions
 - **4 Timeframes**: 15-minute, 1-hour, 4-hour, daily charts
 - **3 Trading Styles**: Scalp (1-2%), Intraday (2-4%), Swing (3-8%)
 - **Risk Tolerance Levels**: Conservative, Moderate, Aggressive
@@ -96,6 +96,9 @@ cd Crypto-Spot-Signal
 # Install dependencies
 npm install
 
+# Optional (recommended): set CoinGecko API key for higher request limits
+echo COINGECKO_API_KEY=your_key_here > .env.local
+
 # Run development server
 npm run dev
 
@@ -113,7 +116,7 @@ npm start
 
 ## 📈 How to Use
 
-1. **Select Trading Pair**: Choose from 8 major cryptocurrencies
+1. **Search Coin**: Type coin name/symbol and pick from live suggestions
 2. **Pick Timeframe**: Select analysis period (15m/1h/4h/1d)
 3. **Choose Signal Type**: Scalp, Intraday, or Swing trading
 4. **Set Risk Tolerance**: Conservative, Moderate, or Aggressive
@@ -192,14 +195,17 @@ No environment variables or configuration needed - it just works!
 Generate a trading signal programmatically.
 
 **Query Parameters:**
-- `symbol` (required): Trading pair (e.g., BTCUSDT)
+- `symbol` (optional): Trading pair (e.g., BTCUSDT)
+- `geckoId` (optional): CoinGecko ID (e.g., bitcoin)
+- `symbolName` (optional): Display name for selected coin
+- `symbolBase` (optional): Base ticker without quote (e.g., BTC)
 - `timeframe` (required): Analysis period (15m/1h/4h/1d)
 - `signalType` (required): Trading style (scalp/intraday/swing)
 - `riskTolerance` (required): Risk level (conservative/moderate/aggressive)
 
 **Example Request:**
 ```bash
-curl "https://your-app.vercel.app/api/signal?symbol=BTCUSDT&timeframe=4h&signalType=swing&riskTolerance=moderate"
+curl "https://your-app.vercel.app/api/signal?symbol=BTCUSDT&geckoId=bitcoin&symbolName=Bitcoin&symbolBase=BTC&timeframe=4h&signalType=swing&riskTolerance=moderate"
 ```
 
 **Example Response:**

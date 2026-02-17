@@ -1,4 +1,5 @@
 import {
+  normalizeTradingSymbol,
   fetchOHLCV,
   fetchFuturesContext,
   fetchCatalystWatch,
@@ -14,15 +15,16 @@ export default async function handler(req, res) {
   const params = req.method === 'POST' ? req.body : req.query;
   const {
     symbol = 'BTCUSDT',
+    geckoId = '',
+    symbolName = '',
+    symbolBase = '',
     timeframe = '4h',
     signalType = 'swing',
     riskTolerance = 'moderate',
   } = params;
+  const normalizedSymbol = normalizeTradingSymbol(symbol || symbolBase || 'BTCUSDT');
 
   // Validate inputs
-  if (!SYMBOL_MAP[symbol]) {
-    return res.status(400).json({ error: `Invalid symbol. Supported: ${Object.keys(SYMBOL_MAP).join(', ')}` });
-  }
   if (!['15m', '1h', '4h', '1d'].includes(timeframe)) {
     return res.status(400).json({ error: 'Invalid timeframe. Supported: 15m, 1h, 4h, 1d' });
   }
@@ -35,9 +37,13 @@ export default async function handler(req, res) {
 
   try {
     const [ohlcv, futuresContext, catalystWatch] = await Promise.all([
-      fetchOHLCV(symbol, timeframe),
-      fetchFuturesContext(symbol, timeframe),
-      fetchCatalystWatch(symbol),
+      fetchOHLCV(normalizedSymbol, timeframe, 120, { geckoId }),
+      fetchFuturesContext(normalizedSymbol, timeframe),
+      fetchCatalystWatch(normalizedSymbol, {
+        geckoId,
+        coinName: symbolName,
+        coinSymbol: symbolBase || normalizedSymbol.replace(/USDT$/, ''),
+      }),
     ]);
 
     if (!ohlcv.length) {
@@ -48,8 +54,10 @@ export default async function handler(req, res) {
       futuresContext,
       catalystWatch,
     });
-    result.symbol = symbol;
-    result.symbolName = SYMBOL_MAP[symbol].name;
+    const knownCoin = SYMBOL_MAP[normalizedSymbol];
+    result.symbol = normalizedSymbol;
+    result.symbolName = symbolName || knownCoin?.name || (symbolBase || normalizedSymbol.replace(/USDT$/, '')).toUpperCase();
+    result.geckoId = geckoId || knownCoin?.geckoId || null;
     result.timeframe = timeframe;
     result.signalType = signalType;
     result.riskTolerance = riskTolerance;

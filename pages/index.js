@@ -1,16 +1,12 @@
 import { useEffect, useState } from 'react';
 import Head from 'next/head';
 
-const COINS = [
-  { value: 'BTCUSDT', label: 'BTC / USDT' },
-  { value: 'ETHUSDT', label: 'ETH / USDT' },
-  { value: 'SOLUSDT', label: 'SOL / USDT' },
-  { value: 'BNBUSDT', label: 'BNB / USDT' },
-  { value: 'XRPUSDT', label: 'XRP / USDT' },
-  { value: 'ADAUSDT', label: 'ADA / USDT' },
-  { value: 'AVAXUSDT', label: 'AVAX / USDT' },
-  { value: 'DOGEUSDT', label: 'DOGE / USDT' },
-];
+const DEFAULT_COIN = {
+  id: 'bitcoin',
+  name: 'Bitcoin',
+  symbol: 'BTC',
+  pair: 'BTCUSDT',
+};
 
 const TIMEFRAMES = [
   { value: '15m', label: '15 Min' },
@@ -70,8 +66,18 @@ function liquidationBiasLabel(bias) {
   return 'Balanced';
 }
 
+function normalizeSymbolText(raw) {
+  const cleaned = String(raw || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+  if (!cleaned) return 'BTC';
+  return cleaned.replace(/USDT$/, '');
+}
+
 export default function Home() {
-  const [symbol, setSymbol] = useState('BTCUSDT');
+  const [coinQuery, setCoinQuery] = useState(DEFAULT_COIN.name);
+  const [selectedCoin, setSelectedCoin] = useState(DEFAULT_COIN);
+  const [coinSuggestions, setCoinSuggestions] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [searchingCoins, setSearchingCoins] = useState(false);
   const [timeframe, setTimeframe] = useState('4h');
   const [signalType, setSignalType] = useState('swing');
   const [riskTolerance, setRiskTolerance] = useState('moderate');
@@ -96,14 +102,79 @@ export default function Home() {
     }
   }, [theme]);
 
+  useEffect(() => {
+    const keyword = coinQuery.trim();
+    if (keyword.length < 2) {
+      setCoinSuggestions([]);
+      setSearchingCoins(false);
+      return;
+    }
+
+    const controller = new AbortController();
+    const timer = setTimeout(async () => {
+      setSearchingCoins(true);
+      try {
+        const params = new URLSearchParams({ q: keyword, limit: '8' });
+        const res = await fetch(`/api/coins/search?${params}`, { signal: controller.signal });
+        if (!res.ok) throw new Error('Search request failed');
+        const payload = await res.json();
+        setCoinSuggestions(payload.coins || []);
+      } catch {
+        if (!controller.signal.aborted) setCoinSuggestions([]);
+      } finally {
+        if (!controller.signal.aborted) setSearchingCoins(false);
+      }
+    }, 260);
+
+    return () => {
+      clearTimeout(timer);
+      controller.abort();
+    };
+  }, [coinQuery]);
+
   async function generate() {
     setLoading(true);
     setError(null);
     try {
-      const params = new URLSearchParams({ symbol, timeframe, signalType, riskTolerance });
+      let coin = selectedCoin;
+      const typed = coinQuery.trim();
+
+      if (!coin && typed.length >= 2) {
+        const searchParams = new URLSearchParams({ q: typed, limit: '1' });
+        const searchRes = await fetch(`/api/coins/search?${searchParams}`);
+        if (searchRes.ok) {
+          const searchPayload = await searchRes.json();
+          if (Array.isArray(searchPayload.coins) && searchPayload.coins.length) {
+            [coin] = searchPayload.coins;
+          }
+        }
+      }
+
+      if (!coin) {
+        const normalized = normalizeSymbolText(typed);
+        coin = {
+          id: '',
+          name: typed || normalized,
+          symbol: normalized,
+          pair: `${normalized}USDT`,
+        };
+      }
+
+      const params = new URLSearchParams({
+        symbol: coin.pair || `${normalizeSymbolText(coin.symbol)}USDT`,
+        geckoId: coin.id || '',
+        symbolName: coin.name || '',
+        symbolBase: coin.symbol || normalizeSymbolText(coin.name),
+        timeframe,
+        signalType,
+        riskTolerance,
+      });
       const res = await fetch(`/api/signal?${params}`);
       if (!res.ok) throw new Error((await res.json()).error || res.statusText);
       setData(await res.json());
+      setSelectedCoin(coin);
+      setCoinQuery(coin.name || coin.symbol);
+      setShowSuggestions(false);
     } catch (e) {
       setError(e.message);
     } finally {
@@ -130,10 +201,54 @@ export default function Home() {
         <div className="form-card">
           <div className="form-grid">
             <div className="form-group">
-              <label>Trading Pair</label>
-              <select value={symbol} onChange={(e) => setSymbol(e.target.value)}>
-                {COINS.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
-              </select>
+              <label>Search Coin</label>
+              <div className="coin-search-wrap">
+                <input
+                  className="coin-search-input"
+                  type="text"
+                  value={coinQuery}
+                  onChange={(e) => {
+                    setCoinQuery(e.target.value);
+                    setSelectedCoin(null);
+                    setShowSuggestions(true);
+                  }}
+                  onFocus={() => setShowSuggestions(true)}
+                  onBlur={() => setTimeout(() => setShowSuggestions(false), 140)}
+                  placeholder="Type coin name or symbol (e.g. pepe, sui, arb)"
+                  autoComplete="off"
+                />
+                {showSuggestions && (
+                  <div className="coin-suggestions">
+                    {searchingCoins && <div className="coin-suggestion muted">Searching...</div>}
+                    {!searchingCoins && coinSuggestions.length === 0 && coinQuery.trim().length >= 2 && (
+                      <div className="coin-suggestion muted">No coin found</div>
+                    )}
+                    {!searchingCoins && coinSuggestions.map((coin) => (
+                      <button
+                        key={`${coin.id}-${coin.symbol}`}
+                        type="button"
+                        className="coin-suggestion"
+                        onMouseDown={() => {
+                          setSelectedCoin(coin);
+                          setCoinQuery(coin.name);
+                          setShowSuggestions(false);
+                        }}
+                      >
+                        <span className="coin-main">
+                          <span className="coin-name">{coin.name}</span>
+                          <span className="coin-symbol">{coin.symbol}</span>
+                        </span>
+                        <span className="coin-meta">{coin.marketCapRank ? `#${coin.marketCapRank}` : '-'}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <div className="coin-hint">
+                {selectedCoin
+                  ? `Selected: ${selectedCoin.name} (${selectedCoin.symbol})`
+                  : 'Select one of the suggested coins for best accuracy'}
+              </div>
             </div>
             <div className="form-group">
               <label>Timeframe</label>
