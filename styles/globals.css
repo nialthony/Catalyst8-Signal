@@ -326,6 +326,8 @@ body {
 .terminal-shell {
   max-width: 1240px;
   margin: 0 auto;
+  position: relative;
+  isolation: isolate;
   border: 2px solid var(--panel-border);
   box-shadow: 0 0 0 2px var(--panel-shadow), 10px 10px 0 var(--panel-shadow);
   background: linear-gradient(180deg, rgba(0, 0, 0, 0.36), rgba(0, 0, 0, 0.1));
@@ -399,8 +401,9 @@ body {
   text-align: left;
   padding: 18px 0 20px;
   position: relative;
-  overflow: hidden;
+  overflow: visible;
   min-height: 132px;
+  z-index: 8;
 }
 
 .terminal-header-main {
@@ -414,7 +417,7 @@ body {
   position: absolute;
   inset: 8px 8px 8px 8px;
   pointer-events: none;
-  z-index: 2;
+  z-index: 9998;
 }
 
 .sponsor-link {
@@ -431,6 +434,8 @@ body {
   width: 60px;
   height: 60px;
   pointer-events: auto;
+  z-index: 9999;
+  will-change: transform;
 }
 
 .sponsor-link:hover {
@@ -448,7 +453,7 @@ body {
   image-rendering: auto;
   display: block;
   background: transparent;
-  filter: brightness(0) invert(1) contrast(1.12);
+  filter: brightness(0) invert(1) contrast(1.12) drop-shadow(0 0 6px rgba(0, 0, 0, 0.75));
   opacity: 1;
 }
 

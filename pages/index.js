@@ -86,6 +86,7 @@ function parseAnalyzeCommand(raw) {
 export default function Home() {
   const coinSearchCacheRef = useRef(new Map());
   const headerRef = useRef(null);
+  const floatingLayerRef = useRef(null);
   const floatingLogoRef = useRef(null);
   const logoRafRef = useRef(null);
   const logoMotionRef = useRef({
@@ -128,16 +129,16 @@ export default function Home() {
 
   useEffect(() => {
     if (typeof window === 'undefined') return undefined;
-    const headerEl = headerRef.current;
+    const layerEl = floatingLayerRef.current;
     const logoEl = floatingLogoRef.current;
-    if (!headerEl || !logoEl) return undefined;
+    if (!layerEl || !logoEl) return undefined;
 
     let running = true;
-    const resetMotion = () => {
-      const headerRect = headerEl.getBoundingClientRect();
+    const resetMotion = (startFromRight = false) => {
+      const layerRect = layerEl.getBoundingClientRect();
       const logoRect = logoEl.getBoundingClientRect();
-      const maxX = Math.max(0, headerRect.width - logoRect.width);
-      logoMotionRef.current.x = maxX;
+      const maxX = Math.max(0, layerRect.width - logoRect.width);
+      logoMotionRef.current.x = startFromRight ? maxX : Math.min(logoMotionRef.current.x, maxX);
       logoMotionRef.current.y = 0;
       logoMotionRef.current.vx = -Math.abs(logoMotionRef.current.vx || -1.55);
       logoMotionRef.current.vy = Math.abs(logoMotionRef.current.vy || 1.2);
@@ -146,14 +147,14 @@ export default function Home() {
 
     const step = () => {
       if (!running) return;
-      const headerRect = headerEl.getBoundingClientRect();
+      const layerRect = layerEl.getBoundingClientRect();
       const logoRect = logoEl.getBoundingClientRect();
-      const maxX = Math.max(0, headerRect.width - logoRect.width);
-      const maxY = Math.max(0, headerRect.height - logoRect.height);
+      const maxX = Math.max(0, layerRect.width - logoRect.width);
+      const maxY = Math.max(0, layerRect.height - logoRect.height);
       const motion = logoMotionRef.current;
 
       if (!motion.initialized) {
-        motion.x = maxX;
+        motion.x = Math.min(motion.x, maxX);
         motion.y = 0;
         motion.initialized = true;
       }
@@ -185,7 +186,7 @@ export default function Home() {
       logoMotionRef.current.initialized = false;
     };
 
-    resetMotion();
+    resetMotion(true);
     logoRafRef.current = window.requestAnimationFrame(step);
     window.addEventListener('resize', handleResize);
 
@@ -355,7 +356,7 @@ export default function Home() {
                 <h1>Catalyst8 Signal</h1>
                 <p>Terminal market intelligence with confluence, catalyst watch, and liquidity heat map</p>
               </div>
-              <div className="floating-logo-layer">
+              <div ref={floatingLayerRef} className="floating-logo-layer">
                 <a
                   ref={floatingLogoRef}
                   className="sponsor-link floating-logo-link"
