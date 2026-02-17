@@ -406,6 +406,76 @@ body {
   margin-bottom: 12px;
 }
 
+.terminal-command-panel {
+  padding: 12px;
+}
+
+.terminal-command-title {
+  font-family: 'Press Start 2P', cursive;
+  font-size: 10px;
+  color: var(--text-blue);
+  margin-bottom: 10px;
+  text-transform: uppercase;
+}
+
+.terminal-command-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.terminal-command-prompt {
+  font-family: 'Press Start 2P', cursive;
+  font-size: 12px;
+  color: var(--text-accent);
+  flex-shrink: 0;
+}
+
+.terminal-command-input {
+  flex: 1;
+  background: var(--input-bg);
+  border: 2px solid var(--input-border);
+  color: var(--text);
+  font-family: 'VT323', monospace;
+  font-size: 28px;
+  padding: 7px 10px;
+}
+
+.terminal-command-input:focus {
+  outline: none;
+  border-color: var(--text-accent);
+  box-shadow: 0 0 0 2px var(--input-focus-glow);
+}
+
+.terminal-command-btn {
+  border: 2px solid var(--button-border);
+  background: linear-gradient(180deg, var(--button-a), var(--button-b));
+  color: var(--text);
+  font-family: 'Press Start 2P', cursive;
+  font-size: 10px;
+  text-transform: uppercase;
+  padding: 11px 10px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.terminal-command-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.terminal-command-help {
+  color: var(--text-dim);
+  font-size: 21px;
+  margin-top: 8px;
+}
+
+.terminal-command-suggestions {
+  margin-top: 8px;
+  border: 2px solid var(--panel-border);
+  background: var(--panel-flat);
+}
+
 .header h1 {
   font-family: 'Press Start 2P', cursive;
   font-size: 22px;
@@ -857,6 +927,7 @@ body {
   .header p { font-size: 22px; }
   .terminal-title { font-size: 8px; }
   .terminal-line { font-size: 19px; }
+  .terminal-command-input { font-size: 24px; }
   .signal-header { flex-direction: column; }
   .signal-meta { text-align: left; font-size: 22px; }
   .price-row { font-size: 14px; }
@@ -866,6 +937,9 @@ body {
 @media (max-width: 520px) {
   .container { padding: 14px 9px 42px; }
   .terminal-topbar { gap: 8px; }
+  .terminal-command-row { flex-wrap: wrap; }
+  .terminal-command-input { width: 100%; font-size: 22px; }
+  .terminal-command-btn { width: 100%; }
   .form-grid { grid-template-columns: 1fr 1fr; }
   .btn-generate { font-size: 10px; }
   .indicator-card .value { font-size: 24px; }
