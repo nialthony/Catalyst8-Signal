@@ -96,6 +96,8 @@ export default function Home() {
   const [signalType, setSignalType] = useState('swing');
   const [riskTolerance, setRiskTolerance] = useState('moderate');
   const [theme, setTheme] = useState('chalkboard');
+  const [showLoginGate, setShowLoginGate] = useState(true);
+  const [loginProgress, setLoginProgress] = useState(0);
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
@@ -115,6 +117,33 @@ export default function Home() {
       window.localStorage.setItem('ui-theme', theme);
     }
   }, [theme]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return undefined;
+    let rafId = null;
+    let doneTimer = null;
+    const durationMs = 5000;
+    const start = performance.now();
+
+    const tick = (now) => {
+      const elapsed = now - start;
+      const pct = Math.min(100, (elapsed / durationMs) * 100);
+      setLoginProgress(pct);
+      if (pct < 100) {
+        rafId = window.requestAnimationFrame(tick);
+      } else {
+        doneTimer = window.setTimeout(() => {
+          setShowLoginGate(false);
+        }, 120);
+      }
+    };
+
+    rafId = window.requestAnimationFrame(tick);
+    return () => {
+      if (rafId) window.cancelAnimationFrame(rafId);
+      if (doneTimer) window.clearTimeout(doneTimer);
+    };
+  }, []);
 
   async function searchCoinSuggestions(rawKeyword, options = {}) {
     const keyword = String(rawKeyword || coinQuery || '').trim();
@@ -254,6 +283,33 @@ export default function Home() {
         <title>Catalyst8 Signal Terminal</title>
       </Head>
 
+      {showLoginGate ? (
+        <div className="login-gate">
+          <div className="login-card">
+            <div className="login-eyebrow">Catalyst8 Terminal Access</div>
+            <h2>Dummy Login</h2>
+            <p>Initializing secure shell profile...</p>
+            <div className="login-form">
+              <div className="login-field">
+                <label>Username</label>
+                <input value="guest_user" readOnly />
+              </div>
+              <div className="login-field">
+                <label>Password</label>
+                <input type="password" value="********" readOnly />
+              </div>
+            </div>
+            <div className="login-progress-row">
+              <span>Authenticating</span>
+              <span>{Math.round(loginProgress)}%</span>
+            </div>
+            <div className="login-progress-track">
+              <div className="login-progress-fill" style={{ width: `${loginProgress}%` }} />
+            </div>
+            <div className="login-spinner" />
+          </div>
+        </div>
+      ) : (
       <div className="terminal-shell">
         <div className="terminal-topbar">
           <div className="terminal-dots">
@@ -805,6 +861,7 @@ export default function Home() {
           </div>
         </div>
       </div>
+      )}
     </>
   );
 }

@@ -299,6 +299,109 @@ body {
   padding: 16px 10px 26px;
 }
 
+.login-gate {
+  max-width: 1240px;
+  margin: 0 auto;
+  min-height: calc(100vh - 42px);
+  border: 2px solid var(--panel-border);
+  box-shadow: 0 0 0 2px var(--panel-shadow), 10px 10px 0 var(--panel-shadow);
+  background:
+    radial-gradient(circle at 20% 10%, rgba(255, 255, 255, 0.08), transparent 38%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.42), rgba(0, 0, 0, 0.22));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.login-card {
+  width: min(520px, 100%);
+  border: 2px solid var(--panel-border);
+  box-shadow: 0 0 0 2px var(--panel-shadow), 6px 6px 0 var(--panel-shadow);
+  background: linear-gradient(180deg, var(--panel-gradient-a), var(--panel-gradient-b));
+  padding: 16px;
+  outline: 1px solid transparent;
+  animation: pixelBorderPulse 2.8s steps(4, end) infinite;
+}
+
+.login-eyebrow {
+  font-family: 'Press Start 2P', cursive;
+  color: var(--text-blue);
+  font-size: 9px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.login-card h2 {
+  font-family: 'Press Start 2P', cursive;
+  font-size: 15px;
+  color: var(--text-accent);
+  margin-bottom: 10px;
+}
+
+.login-card p {
+  color: var(--text-dim);
+  font-size: 24px;
+  margin-bottom: 12px;
+}
+
+.login-form {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.login-field label {
+  display: block;
+  font-family: 'Press Start 2P', cursive;
+  color: var(--text-blue);
+  font-size: 9px;
+  margin-bottom: 6px;
+}
+
+.login-field input {
+  width: 100%;
+  background: var(--input-bg);
+  border: 2px solid var(--input-border);
+  color: var(--text);
+  font-family: 'VT323', monospace;
+  font-size: 24px;
+  padding: 7px 9px;
+}
+
+.login-progress-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: 'Press Start 2P', cursive;
+  color: var(--text-blue);
+  font-size: 9px;
+  margin-bottom: 7px;
+}
+
+.login-progress-track {
+  height: 14px;
+  border: 2px solid var(--panel-border-soft);
+  background: var(--panel-flat);
+  overflow: hidden;
+}
+
+.login-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--quality-fill-a), var(--quality-fill-b));
+  transition: width 0.08s linear;
+}
+
+.login-spinner {
+  width: 24px;
+  height: 24px;
+  border: 3px solid var(--panel-border-soft);
+  border-top-color: var(--text-accent);
+  margin-top: 12px;
+  animation: spin 0.8s linear infinite;
+}
+
 @keyframes pixelBorderPulse {
   0%, 100% {
     border-color: var(--pulse-1);
